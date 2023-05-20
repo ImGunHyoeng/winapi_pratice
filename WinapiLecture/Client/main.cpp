@@ -10,7 +10,8 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-
+POINT g_point = { 500,300 };
+POINT g_objescale = { 100,100 };
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -146,7 +147,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)//키보드 부가정보 WPARAM ,마우스 부가정보 LPARAM
 {
     switch (message)
     {
@@ -186,12 +187,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //윈도우 핸들
             //윈도우 좌표
             //HDC?
+            HPEN hRedPen = CreatePen(PS_SOLID,1,RGB(255,0,0));//빨간펜
+            HBRUSH hBlueBrush = CreateSolidBrush(RGB(0, 0, 255));
+            //GetStockObject();//자주쓰는 브러쉬나 펜의 경우에는 만들어 놓음
+            //기본 펜 ID 값을 받아둠,브러쉬의 값도 받아놓음
 
-            Rectangle(hdc,10,10,110,110);//받아온 ID값으로 처리한다.
+            HPEN hDefaultPen=(HPEN)SelectObject(hdc, hRedPen);//오브젝트를 선택해라 원래의 펜을 버리고 다른 펜을 선택함
+            HBRUSH hDefaultBrush = (HBRUSH)SelectObject(hdc, hBlueBrush);
+            //반환될때 void포인터로 돌아오기에 이를 HPEN으로 돌려줌
+            //범용적으로 사용하기 위해서 void로 선언함 알아서 캐스팅해서 받아가라는식으로 사용한다.
+
+            
+            //지정된 스타일과 폭을 가지고 펜을 만들어준다.
+            Rectangle(hdc
+                ,g_point.x - g_objescale.x/2//포인트의 값으로 위치를 지정함
+                ,g_point.y - g_objescale.y/2
+                , g_point.x + g_objescale.x / 2
+                , g_point.y + g_objescale.y / 2);//받아온 ID값으로 처리한다.
+            //다시 원래 팬으로 돌려놓음
+            SelectObject(hdc, hDefaultPen);//전의 값은 필요없어졌기에 안받는다.
+            SelectObject(hdc, hDefaultBrush);
+
+            DeleteObject(hRedPen);
+            DeleteObject(hBlueBrush);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             EndPaint(hWnd, &ps);
         }
         break;
+    case WM_KEYDOWN://키가 눌리게 되면은 발생함
+    {
+        switch (wParam)//대문자 기준으로 됨
+        {
+        //꾹누르면은 1초이상 누를시에 계속 이벤트가 들어오도록 설정함
+        //바로바로 자연스럽게 이동이 안된다.
+        case VK_UP://방향키 화살표 위
+            g_point.y -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            InvalidateRect(hWnd,nullptr,true);//강제로 무효화영역을 만듬
+            //nullptr을 하면은 전체 영역을 본다
+            //false을 하면은 기존에 있던것을 삭제하지 않음
+            //true을 함으로써 값을 초기화해줌
+            break;
+        case VK_DOWN:
+            g_point.y += 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
+            break;
+        case VK_LEFT:
+            g_point.x -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
+            break;
+        case VK_RIGHT:
+            g_point.x += 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
+            break;
+        case 'W':
+        {
+            int a = 0;
+        }
+            break;
+        }
+        int a = 0;
+    }
+        break;
+    case WM_LBUTTONDOWN:
+    {
+        //4바이트 를 가져와서 2바이트 끼리 나눠서
+        //g_x = LOWORD(lParam);//x좌표
+        //g_y = HIWORD(lParam);//y좌표
+        //좌표의 기준은 클라이언트의 좌표기준으로써 계산하는것이다.
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
