@@ -167,15 +167,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_PAINT:
+    case WM_PAINT://윈도우에 그려야하는 함수를 의미한다. 무효화 영역이 발생한 경우에 발생한다.
+        //(invalidata) 무효화
         {
             PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+
+            /*struct __HDC 이런식으로 만든어짐
+            {
+                int a;//int에다가 ID의 값을 넣는다.
+            }typdef HDC;*/
+            /*HWND;
+            HPEN; 이런 같은 형식을 다른 이름으로 하는이유//단순하게 알아보기 쉽게,ID의 겹치지 않도록
+            */
+            HDC hdc = BeginPaint(hWnd, &ps);//Device Context(그리기관련)
+            //DC 의 목적지는 hwind
+            //DC 의 펜은 기본펜(Black)
+            //DC 의 브러쉬는 기본 브러쉬(White)
             //윈도우 핸들
             //윈도우 좌표
             //HDC?
 
-            Rectangle(hdc,10,10,110,110);
+            Rectangle(hdc,10,10,110,110);//받아온 ID값으로 처리한다.
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             EndPaint(hWnd, &ps);
         }
