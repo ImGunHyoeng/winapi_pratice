@@ -7,11 +7,11 @@
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
+HWND g_hwind;//메인 윈도우 핸들
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-POINT g_point = { 500,300 };
-POINT g_objescale = { 100,100 };
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -55,6 +55,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance/*실행 된 프로세스의 시�
     msg.hwnd;//메시지가 발생한 윈도우를 의미함
     //하나의 프로세스에서 여러개의 창을 가져올수도 있기에 창을 알려줌
 
+    SetTimer(g_hwind, 0, 0, nullptr);//시간마다 기능이 발생되도록함.
+    
     // 기본 메시지 루프입니다:
     //GetMessage는 해당하는 곳으로 온 명령이 있는지 확인하고 처리하는것
     //메세지큐에서 메세지 확인할때까지 대기
@@ -70,6 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance/*실행 된 프로세스의 시�
             DispatchMessage(&msg);
         }
     }
+    KillTimer(g_hwind, 0);//id의 값을 입력해서 삭제함 커널 오브젝트
     //창이 종료되는 프로그램도 끝나도록 설계되어있는것
     //이렇게 설계가 되어있는것이지 윈도우가 끝난다고 모든 프로세스가 종료 된다고 하는것은 아님
     return (int) msg.wParam;
@@ -123,19 +126,37 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
    //제목을 직접 바꾸고 싶다면 szTitle에다가 해당하는 값을 입력하면 된다
    //등록된 키값을 토대로 찾아오는것
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   g_hwind = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
    //객체를 만들고 이벤트를 처리하기 위한 함수의 포인터까지 세팅해 준것이다
-   if (!hWnd)
+   if (!g_hwind)
    {
       return FALSE;
    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+   ShowWindow(g_hwind, nCmdShow);
+   UpdateWindow(g_hwind);
 
    return TRUE;
 }
+
+#include <vector>
+
+using std::vector;
+
+struct  tOBjInfo
+{
+    POINT g_point;//= { 500,300 };
+    POINT g_objescale;// = { 100,100 };
+};
+
+vector<tOBjInfo> g_vecInfo;
+
+//좌상단의 위치를 기억하는것
+POINT g_LTP;
+//오른쪽 하단을 기억
+POINT g_ptRB;
+bool isLbtm;
 
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -197,13 +218,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
             //반환될때 void포인터로 돌아오기에 이를 HPEN으로 돌려줌
             //범용적으로 사용하기 위해서 void로 선언함 알아서 캐스팅해서 받아가라는식으로 사용한다.
 
-            
-            //지정된 스타일과 폭을 가지고 펜을 만들어준다.
-            Rectangle(hdc
-                ,g_point.x - g_objescale.x/2//포인트의 값으로 위치를 지정함
-                ,g_point.y - g_objescale.y/2
-                , g_point.x + g_objescale.x / 2
-                , g_point.y + g_objescale.y / 2);//받아온 ID값으로 처리한다.
+            if (isLbtm)//lbtn이 눌렸을때만 추가 //지정된 스타일과 폭을 가지고 펜을 만들어준다.
+            {
+                Rectangle(hdc
+                    , g_LTP.x, g_LTP.y
+                    , g_ptRB.x, g_ptRB.y);//마우스로 위치를 기억하도록
+            }
+            //벡터안에 추가된 사각형들도 그려준다
+            for (size_t i = 0; i < g_vecInfo.size(); i++)
+            {
+                Rectangle(hdc
+                    , g_vecInfo[i].g_point.x - g_vecInfo[i].g_objescale.x/2
+                    , g_vecInfo[i].g_point.y - g_vecInfo[i].g_objescale.y / 2
+                    , g_vecInfo[i].g_point.x + g_vecInfo[i].g_objescale.x / 2
+                    , g_vecInfo[i].g_point.y + g_vecInfo[i].g_objescale.y / 2);//마우스로 위치를 기억하도록
+            }
+                //,g_point.x - g_objescale.x/2//포인트의 값으로 위치를 지정함
+                //,g_point.y - g_objescale.y/2
+                //, g_point.x + g_objescale.x / 2
+                //, g_point.y + g_objescale.y / 2);//받아온 ID값으로 처리한다.
             //다시 원래 팬으로 돌려놓음
             SelectObject(hdc, hDefaultPen);//전의 값은 필요없어졌기에 안받는다.
             SelectObject(hdc, hDefaultBrush);
@@ -221,24 +254,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
         //꾹누르면은 1초이상 누를시에 계속 이벤트가 들어오도록 설정함
         //바로바로 자연스럽게 이동이 안된다.
         case VK_UP://방향키 화살표 위
-            g_point.y -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            //g_point.y -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
             InvalidateRect(hWnd,nullptr,true);//강제로 무효화영역을 만듬
             //nullptr을 하면은 전체 영역을 본다
             //false을 하면은 기존에 있던것을 삭제하지 않음
             //true을 함으로써 값을 초기화해줌
             break;
         case VK_DOWN:
-            g_point.y += 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            //.y += 5;//화면 무효화영역이 안되기에 업데이트 안됨
             InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
             break;
         case VK_LEFT:
-            g_point.x -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
+            //g_point.x -= 5;//화면 무효화영역이 안되기에 업데이트 안됨
             InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
             break;
         case VK_RIGHT:
-            g_point.x += 5;//화면 무효화영역이 안되기에 업데이트 안됨
+           // g_point.x += 5;//화면 무효화영역이 안되기에 업데이트 안됨
             InvalidateRect(hWnd, nullptr, true);//강제로 무효화영역을 만듬
             break;
+      
         case 'W':
         {
             int a = 0;
@@ -248,12 +282,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
         int a = 0;
     }
         break;
+    case WM_TIMER://메시지를 보고서 사용
+    {
+        int a = 0;
+    }
+        break;
     case WM_LBUTTONDOWN:
     {
+        isLbtm = true;
+        g_LTP.x = LOWORD(lParam);
+        g_LTP.y = HIWORD(lParam);
         //4바이트 를 가져와서 2바이트 끼리 나눠서
         //g_x = LOWORD(lParam);//x좌표
         //g_y = HIWORD(lParam);//y좌표
         //좌표의 기준은 클라이언트의 좌표기준으로써 계산하는것이다.
+    }
+    break;
+    case WM_MOUSEMOVE:
+    {
+        g_ptRB.x = LOWORD(lParam);
+        g_ptRB.y = HIWORD(lParam);
+        InvalidateRect(hWnd, nullptr, true);
+    }
+    break;
+    case WM_LBUTTONUP:
+    {  
+        tOBjInfo info = {};
+        info.g_point.x = (g_LTP.x + g_ptRB.x) / 2;
+        info.g_point.y = (g_LTP.y + g_ptRB.y) / 2;//중앙의 위치를 구함
+
+        info.g_objescale.x = abs(g_ptRB.x - g_LTP.x);
+        info.g_objescale.y = abs(g_ptRB.y - g_LTP.y);
+        g_vecInfo.push_back(info);
+        InvalidateRect(hWnd, nullptr, true);
+        isLbtm = false;
+        
     }
     break;
     case WM_DESTROY:
