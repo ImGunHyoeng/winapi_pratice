@@ -61,15 +61,55 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance/*실행 된 프로세스의 시�
     //GetMessage는 해당하는 곳으로 온 명령이 있는지 확인하고 처리하는것
     //메세지큐에서 메세지 확인할때까지 대기
     //msg.mesage==WM_QUIT 이라는 메세지를 받는다면 false를 반환한다.->프로그램 종료 //먼저,윈도우가종료되고 해제되어야한다
-    //이것은 게임을 만드는데 부적합하다.
-    while (GetMessage(&msg, nullptr, 0, 0))//입력을 받는다
+    //이것은 게임을 만드는데 부적합하다. (getmessage)
+
+    //peekMessage
+    //항상 반환된다. 메시지의 유무와 관계없이 반환
+    //메시지큐에 메시지를 확인한 경우 true,아니면 false를 반환
+    
+    int iMsgCheck = 0;
+    int iNoneMesgCheck = 0;
+    DWORD dwPreCount = GetTickCount();//초당 1000씩
+    DWORD dwAccCount = 0;
+    while (1)//입력을 받는다 
     {
-        
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        //확인한 메시지를 보고나서 삭제
+        //메시지를 몰래 보겠다.
+        //PeekMessage();
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            //위에서 받아온 메시지들을 처리해주는것이다.
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            int iTIme = GetTickCount();
+            if (msg.message == WM_QUIT)
+                break;
+
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            {
+                //위에서 받아온 메시지들을 처리해주는것이다.
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            //++iMsgCheck;
+            dwAccCount = GetTickCount()-iTIme;
+        }
+        else
+        {
+        
+            //메세지가 없는동안 호출
+            //약 99%가 메시지가 없는데 활동이 일어난다.
+            //++iNoneMesgCheck;
+            DWORD dwCurCount = GetTickCount();
+            if (dwCurCount - dwPreCount > 1000)//처음측정후 1초가 지난시점
+            {
+                float fRatio=(float)dwAccCount / 1000.f;
+                wchar_t szBuff[50] = {};
+                swprintf_s(szBuff, L"비율:%f", fRatio);
+                //wsprintf(szBuff, L"비율:%f", fRatio);//문자열로 반환해주는 함수
+                SetWindowText(g_hwind, szBuff);//윈도우의 텍스트값을 바꾸는 함수
+                dwPreCount = dwCurCount;//1초일때 한번만 출력
+            }
+            //게임코드 수행
+            //디자인 패턴(설계 유형)
+            //싱글톤 패턴 중요함
         }
     }
     KillTimer(g_hwind, 0);//id의 값을 입력해서 삭제함 커널 오브젝트
