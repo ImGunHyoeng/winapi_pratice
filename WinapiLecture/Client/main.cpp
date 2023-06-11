@@ -1,8 +1,9 @@
 ﻿// Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
+#include "pch.h"
 #include "framework.h"
 #include "Client.h"
+#include "CCore.h"
 
 #define MAX_LOADSTRING 100
 
@@ -66,7 +67,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance/*실행 된 프로세스의 시�
     //peekMessage
     //항상 반환된다. 메시지의 유무와 관계없이 반환
     //메시지큐에 메시지를 확인한 경우 true,아니면 false를 반환
-    
+    //CCore *a=CCore::GetInstace();;
+    //CCore 
+    //Core 초기화
+    if (FAILED(CCore::GetInst()->init(g_hwind,POINT{1280,768})))//해당객체가 안만들어졌다면은 해당 프로그램이 종료되도록 설정
+    {
+        MessageBox(nullptr, L"Core 객체 초기화 실패", L"ERROR", MB_OK);//mb_ok는 ok키가 뜨는 창을 만들어주는 옵션
+        return FALSE;
+    }
     int iMsgCheck = 0;
     int iNoneMesgCheck = 0;
     DWORD dwPreCount = GetTickCount();//초당 1000씩
@@ -92,21 +100,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance/*실행 된 프로세스의 시�
             dwAccCount = GetTickCount()-iTIme;
         }
         else
-        {
+        {   
+            //Game 코드 수행
+            //디자인 패턴(설계 유형)
+            //싱글톤 패턴
+
+            CCore::GetInst()->progress();
         
             //메세지가 없는동안 호출
             //약 99%가 메시지가 없는데 활동이 일어난다.
             //++iNoneMesgCheck;
-            DWORD dwCurCount = GetTickCount();
-            if (dwCurCount - dwPreCount > 1000)//처음측정후 1초가 지난시점
-            {
-                float fRatio=(float)dwAccCount / 1000.f;
-                wchar_t szBuff[50] = {};
-                swprintf_s(szBuff, L"비율:%f", fRatio);
-                //wsprintf(szBuff, L"비율:%f", fRatio);//문자열로 반환해주는 함수
-                SetWindowText(g_hwind, szBuff);//윈도우의 텍스트값을 바꾸는 함수
-                dwPreCount = dwCurCount;//1초일때 한번만 출력
-            }
+            //DWORD dwCurCount = GetTickCount();
+            //if (dwCurCount - dwPreCount > 1000)//처음측정후 1초가 지난시점
+            //{
+            //    float fRatio=(float)dwAccCount / 1000.f;
+            //    wchar_t szBuff[50] = {};
+            //    swprintf_s(szBuff, L"비율:%f", fRatio);
+            //    //wsprintf(szBuff, L"비율:%f", fRatio);//문자열로 반환해주는 함수
+            //    SetWindowText(g_hwind, szBuff);//윈도우의 텍스트값을 바꾸는 함수
+            //    dwPreCount = dwCurCount;//1초일때 한번만 출력
+            //}
             //게임코드 수행
             //디자인 패턴(설계 유형)
             //싱글톤 패턴 중요함
@@ -242,48 +255,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
             HPEN; 이런 같은 형식을 다른 이름으로 하는이유//단순하게 알아보기 쉽게,ID의 겹치지 않도록
             */
             HDC hdc = BeginPaint(hWnd, &ps);//Device Context(그리기관련)
-            //DC 의 목적지는 hwind
-            //DC 의 펜은 기본펜(Black)
-            //DC 의 브러쉬는 기본 브러쉬(White)
-            //윈도우 핸들
-            //윈도우 좌표
-            //HDC?
-            HPEN hRedPen = CreatePen(PS_SOLID,1,RGB(255,0,0));//빨간펜
-            HBRUSH hBlueBrush = CreateSolidBrush(RGB(0, 0, 255));
-            //GetStockObject();//자주쓰는 브러쉬나 펜의 경우에는 만들어 놓음
-            //기본 펜 ID 값을 받아둠,브러쉬의 값도 받아놓음
+            ////DC 의 목적지는 hwind
+            ////DC 의 펜은 기본펜(Black)
+            ////DC 의 브러쉬는 기본 브러쉬(White)
+            ////윈도우 핸들
+            ////윈도우 좌표
+            ////HDC?
+            //HPEN hRedPen = CreatePen(PS_SOLID,1,RGB(255,0,0));//빨간펜
+            //HBRUSH hBlueBrush = CreateSolidBrush(RGB(0, 0, 255));
+            ////GetStockObject();//자주쓰는 브러쉬나 펜의 경우에는 만들어 놓음
+            ////기본 펜 ID 값을 받아둠,브러쉬의 값도 받아놓음
+            
+            //Rectangle(hdc, 1180, 0, 1280, 100);
+            
+            //HPEN hDefaultPen=(HPEN)SelectObject(hdc, hRedPen);//오브젝트를 선택해라 원래의 펜을 버리고 다른 펜을 선택함
+            //HBRUSH hDefaultBrush = (HBRUSH)SelectObject(hdc, hBlueBrush);
+            ////반환될때 void포인터로 돌아오기에 이를 HPEN으로 돌려줌
+            ////범용적으로 사용하기 위해서 void로 선언함 알아서 캐스팅해서 받아가라는식으로 사용한다.
 
-            HPEN hDefaultPen=(HPEN)SelectObject(hdc, hRedPen);//오브젝트를 선택해라 원래의 펜을 버리고 다른 펜을 선택함
-            HBRUSH hDefaultBrush = (HBRUSH)SelectObject(hdc, hBlueBrush);
-            //반환될때 void포인터로 돌아오기에 이를 HPEN으로 돌려줌
-            //범용적으로 사용하기 위해서 void로 선언함 알아서 캐스팅해서 받아가라는식으로 사용한다.
+            //if (isLbtm)//lbtn이 눌렸을때만 추가 //지정된 스타일과 폭을 가지고 펜을 만들어준다.
+            //{
+            //    Rectangle(hdc
+            //        , g_LTP.x, g_LTP.y
+            //        , g_ptRB.x, g_ptRB.y);//마우스로 위치를 기억하도록
+            //}
+            ////벡터안에 추가된 사각형들도 그려준다
+            //for (size_t i = 0; i < g_vecInfo.size(); i++)
+            //{
+            //    Rectangle(hdc
+            //        , g_vecInfo[i].g_point.x - g_vecInfo[i].g_objescale.x/2
+            //        , g_vecInfo[i].g_point.y - g_vecInfo[i].g_objescale.y / 2
+            //        , g_vecInfo[i].g_point.x + g_vecInfo[i].g_objescale.x / 2
+            //        , g_vecInfo[i].g_point.y + g_vecInfo[i].g_objescale.y / 2);//마우스로 위치를 기억하도록
+            //}
+            //    //,g_point.x - g_objescale.x/2//포인트의 값으로 위치를 지정함
+            //    //,g_point.y - g_objescale.y/2
+            //    //, g_point.x + g_objescale.x / 2
+            //    //, g_point.y + g_objescale.y / 2);//받아온 ID값으로 처리한다.
+            ////다시 원래 팬으로 돌려놓음
+            //SelectObject(hdc, hDefaultPen);//전의 값은 필요없어졌기에 안받는다.
+            //SelectObject(hdc, hDefaultBrush);
 
-            if (isLbtm)//lbtn이 눌렸을때만 추가 //지정된 스타일과 폭을 가지고 펜을 만들어준다.
-            {
-                Rectangle(hdc
-                    , g_LTP.x, g_LTP.y
-                    , g_ptRB.x, g_ptRB.y);//마우스로 위치를 기억하도록
-            }
-            //벡터안에 추가된 사각형들도 그려준다
-            for (size_t i = 0; i < g_vecInfo.size(); i++)
-            {
-                Rectangle(hdc
-                    , g_vecInfo[i].g_point.x - g_vecInfo[i].g_objescale.x/2
-                    , g_vecInfo[i].g_point.y - g_vecInfo[i].g_objescale.y / 2
-                    , g_vecInfo[i].g_point.x + g_vecInfo[i].g_objescale.x / 2
-                    , g_vecInfo[i].g_point.y + g_vecInfo[i].g_objescale.y / 2);//마우스로 위치를 기억하도록
-            }
-                //,g_point.x - g_objescale.x/2//포인트의 값으로 위치를 지정함
-                //,g_point.y - g_objescale.y/2
-                //, g_point.x + g_objescale.x / 2
-                //, g_point.y + g_objescale.y / 2);//받아온 ID값으로 처리한다.
-            //다시 원래 팬으로 돌려놓음
-            SelectObject(hdc, hDefaultPen);//전의 값은 필요없어졌기에 안받는다.
-            SelectObject(hdc, hDefaultBrush);
-
-            DeleteObject(hRedPen);
-            DeleteObject(hBlueBrush);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+            //DeleteObject(hRedPen);
+            //DeleteObject(hBlueBrush);
+            //// TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             EndPaint(hWnd, &ps);
         }
         break;
