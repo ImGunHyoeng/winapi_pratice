@@ -47,8 +47,10 @@ int CCore:: init(HWND _hWnd,POINT _ptResolution)
 
 void CCore::progress()
 {
-	
+	CTImeMgr::GetInst()->update();
+
 	update();
+
 	render();
 	
 
