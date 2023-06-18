@@ -13,3 +13,6 @@
 						type();\
 						~type();
 //이렇게 자료형을 넣으면 해당하는 것을 single톤으로서 생성해주겠다는 뜻을 가짐
+
+#define fDT CTImeMgr::GetInst()->GetfDT()
+#define	DT CTImeMgr::GetInst()->GetDT()
