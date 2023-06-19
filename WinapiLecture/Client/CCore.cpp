@@ -80,12 +80,12 @@ void CCore::update()
 	//}
 	////물체의 변경점을 측정하는곳
 	Vec2 vPos = g_cobj.GetPos();
-	if (CKeyMgr::GetInst()->GetKeyState(KEY::LEFT)==KEY_STATE::TAP)//한번의 키만 입력된 경우
+	if (CKeyMgr::GetInst()->GetKeyState(KEY::LEFT)==KEY_STATE::HOLD)//한번의 키만 입력된 경우
 	{
 		//vPos.x -= 100.f*DeltaTime;
 		vPos.x -= 100 * fDT;//CTImeMgr::GetInst()->GetfDT();//각 프레임만큼의 해당 작업을 완료한다는 개념이다.
 	}
-	if (CKeyMgr::GetInst()->GetKeyState(KEY::RIGHT) == KEY_STATE::TAP)
+	if (CKeyMgr::GetInst()->GetKeyState(KEY::RIGHT) == KEY_STATE::HOLD)
 	{
 		vPos.x+= 100 *CTImeMgr::GetInst()->GetfDT();
 	}
