@@ -6,3 +6,6 @@
 using std::vector;
 #include "define.h"
 #include "m_struct.h"
+#include <string>
+using std::string;
+using std::wstring;

@@ -16,3 +16,25 @@
 
 #define fDT CTImeMgr::GetInst()->GetfDT()
 #define	DT CTImeMgr::GetInst()->GetDT()
+
+enum class GROUP_TYPE
+{
+	DEFAULT,
+
+	PLAYER,
+
+	MISSILE,
+
+	MONSTER,
+
+	END=32,
+};
+
+enum class SCENE_TYPE
+{
+	TOOL,
+	START,
+	STAGE_01,
+	STAGE_02,
+	END,
+};
