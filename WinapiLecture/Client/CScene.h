@@ -12,6 +12,17 @@ public:
 	void SetName(const wstring& _stName) { m_strName = m_strName; }
 	const wstring& GetName() { return m_strName; }
 
+	virtual void Enter() = 0;//해당 씬에 진입 시 호출
+
+	virtual void Exit() = 0;//해당 씬에 탈출 시 호출
+	void update();
+	void render(HDC _dc);
+protected:
+	void AddObject(CObject* _pobj, GROUP_TYPE _eType)
+	{
+		m_arrObj[(UINT)_eType].push_back(_pobj);
+	}
+
 public:
 	CScene();
 	virtual ~CScene();//상속을 할시에 무조건 해야할것
