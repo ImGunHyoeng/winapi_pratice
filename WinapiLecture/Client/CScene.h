@@ -14,6 +14,6 @@ public:
 
 public:
 	CScene();
-	~CScene();
+	virtual ~CScene();//상속을 할시에 무조건 해야할것
 };
 

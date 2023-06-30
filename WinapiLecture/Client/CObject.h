@@ -12,6 +12,6 @@ public:
 	Vec2 GetScale() { return m_ptScale; }
 public:
 	CObject();
-	~CObject();
+	virtual ~CObject();
 };
 

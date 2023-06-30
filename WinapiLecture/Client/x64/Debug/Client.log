@@ -1,8 +1,4 @@
-﻿  CCore.cpp
-C:\Users\ynoe3\source\repos\Winproj\WinapiLecture\Client\CCore.cpp(29,11): warning C4552: '-': 식의 결과가 사용되지 않습니다.
-C:\Users\ynoe3\source\repos\Winproj\WinapiLecture\Client\CCore.cpp(30,12): warning C4552: '-': 식의 결과가 사용되지 않습니다.
-  CKeyMgr.cpp
-  CObject.cpp
-  CTImeMgr.cpp
-  main.cpp
+﻿  CScene.cpp
+  CSceneMgr.cpp
+  CScene_Start.cpp
   Client.vcxproj -> C:\Users\ynoe3\source\repos\Winproj\WinapiLecture\x64\Debug\Client.exe

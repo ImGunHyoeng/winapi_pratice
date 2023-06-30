@@ -2,7 +2,9 @@
 #include "CCore.h"
 #include "CTImeMgr.h"
 #include "CKeyMgr.h"
+#include "CSceneMgr.h"
 #include "CObject.h"
+
 //CCore * CCore::g_C_inst = nullptr;
 
 CObject g_cobj;
@@ -43,7 +45,7 @@ int CCore:: init(HWND _hWnd,POINT _ptResolution)
 	//Manager 초기화
 	CTImeMgr::GetInst()->init();
 	CKeyMgr::GetInst()->init();
-
+	CSceneMgr::GetInst()->init();
 
 	g_cobj.SetPos(Vec2{ (float)(m_ptResolution.x / 2),(float)(m_ptResolution.y / 2) });
 	g_cobj.SetScale(Vec2{ 100,100 });
@@ -59,56 +61,63 @@ void CCore::progress()
 	CTImeMgr::GetInst()->update();
 	CKeyMgr::GetInst()->update();
 
-	update();
-
-	render();
+	CSceneMgr::GetInst()->update();
 	
-
-}
-
-void CCore::update()
-{
-	//static int callcount = 0;
-	//++callcount;
-
-	//static int iPrevCount = GetTickCount();
-	//int iCurCount = GetTickCount();
-	//if (iCurCount - iPrevCount > 1000)
-	//{
-	//	iPrevCount = iCurCount;
-	//	callcount = 0;
-	//}
-	////물체의 변경점을 측정하는곳
-	Vec2 vPos = g_cobj.GetPos();
-	if (CKeyMgr::GetInst()->GetKeyState(KEY::LEFT)==KEY_STATE::HOLD)//한번의 키만 입력된 경우
-	{
-		//vPos.x -= 100.f*DeltaTime;
-		vPos.x -= 100 * fDT;//CTImeMgr::GetInst()->GetfDT();//각 프레임만큼의 해당 작업을 완료한다는 개념이다.
-	}
-	if (CKeyMgr::GetInst()->GetKeyState(KEY::RIGHT) == KEY_STATE::HOLD)
-	{
-		vPos.x+= 100 *CTImeMgr::GetInst()->GetfDT();
-	}
-	g_cobj.SetPos(vPos);
-}
-
-void CCore::render()
-{
-	//화면 Clear
+	//===============
+	//Rendering
+	//===============
+	//화면 클리어
 	Rectangle(m_memDC, -1, -1, m_ptResolution.x + 1, m_ptResolution.y + 1);
-	
-	//그리기
-	Vec2 vPos = g_cobj.GetPos();
-	Vec2 vScale = g_cobj.GetScale();
-	Rectangle(m_memDC, int(vPos.x - vScale.x / 2.f)
-					, int(vPos.y-vScale.y/2.f)
-					, int(vPos.x + vScale.x / 2.f)
-					, int(vPos.y+vScale.y/2.f));
+
+	CSceneMgr::GetInst()->render(m_memDC);//memDC쪽으로 렌더링을 한다.
+
 
 	//bitblt는 항상 고정값이기에 이후에 프레임 드랍이 잘 일어나지 않는다.
 	BitBlt(m_hDC, 0, 0, m_ptResolution.x, m_ptResolution.y
 		, m_memDC, 0, 0, SRCCOPY);//하나하나 복사해서 넘김
 }
+
+//void CCore::update()
+//{
+//	//static int callcount = 0;
+//	//++callcount;
+//
+//	//static int iPrevCount = GetTickCount();
+//	//int iCurCount = GetTickCount();
+//	//if (iCurCount - iPrevCount > 1000)
+//	//{
+//	//	iPrevCount = iCurCount;
+//	//	callcount = 0;
+//	//}
+//	////물체의 변경점을 측정하는곳
+//	Vec2 vPos = g_cobj.GetPos();
+//	if (CKeyMgr::GetInst()->GetKeyState(KEY::LEFT)==KEY_STATE::HOLD)//한번의 키만 입력된 경우
+//	{
+//		//vPos.x -= 100.f*DeltaTime;
+//		vPos.x -= 100 * fDT;//CTImeMgr::GetInst()->GetfDT();//각 프레임만큼의 해당 작업을 완료한다는 개념이다.
+//	}
+//	if (CKeyMgr::GetInst()->GetKeyState(KEY::RIGHT) == KEY_STATE::HOLD)
+//	{
+//		vPos.x+= 100 *CTImeMgr::GetInst()->GetfDT();
+//	}
+//	g_cobj.SetPos(vPos);
+//}
+//
+//void CCore::render()
+//{
+//	//화면 Clear
+//
+//	
+//	//그리기
+//	Vec2 vPos = g_cobj.GetPos();
+//	Vec2 vScale = g_cobj.GetScale();
+//	Rectangle(m_memDC, int(vPos.x - vScale.x / 2.f)
+//					, int(vPos.y-vScale.y/2.f)
+//					, int(vPos.x + vScale.x / 2.f)
+//					, int(vPos.y+vScale.y/2.f));
+//
+//	
+//}
 
 CCore::CCore() : m_hWnd(0), m_ptResolution{},m_hDC(0),m_hBit(0),m_memDC(0)
 {
