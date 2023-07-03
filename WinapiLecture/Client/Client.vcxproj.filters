@@ -45,6 +45,9 @@
     <Filter Include="Engine\05.Scene\Scene_Tool">
       <UniqueIdentifier>{ddcf58ab-1e63-4831-ae00-6d83100664c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\04.Object\Player">
+      <UniqueIdentifier>{f2d4a3c9-5635-465e-a145-3af65eb54567}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCore.h">
@@ -87,6 +90,9 @@
     <ClInclude Include="CScene_Start.h">
       <Filter>Engine\05.Scene\Scene_Start</Filter>
     </ClInclude>
+    <ClInclude Include="CPlayer.h">
+      <Filter>Engine\04.Object\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCore.cpp">
@@ -110,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="CScene_Start.cpp">
       <Filter>Engine\05.Scene\Scene_Start</Filter>
+    </ClCompile>
+    <ClCompile Include="CPlayer.cpp">
+      <Filter>Engine\04.Object\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
