@@ -48,6 +48,9 @@
     <Filter Include="Engine\04.Object\Player">
       <UniqueIdentifier>{f2d4a3c9-5635-465e-a145-3af65eb54567}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\04.Object\Monster">
+      <UniqueIdentifier>{51ac1198-a996-4278-86de-c6180fedd0d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCore.h">
@@ -93,6 +96,9 @@
     <ClInclude Include="CPlayer.h">
       <Filter>Engine\04.Object\Player</Filter>
     </ClInclude>
+    <ClInclude Include="CMonster.h">
+      <Filter>Engine\04.Object\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCore.cpp">
@@ -119,6 +125,9 @@
     </ClCompile>
     <ClCompile Include="CPlayer.cpp">
       <Filter>Engine\04.Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="CMonster.cpp">
+      <Filter>Engine\04.Object\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

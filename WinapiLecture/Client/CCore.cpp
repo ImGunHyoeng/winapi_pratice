@@ -7,7 +7,7 @@
 
 //CCore * CCore::g_C_inst = nullptr;
 
-CObject g_cobj;
+//CObject g_cobj;
 int CCore:: init(HWND _hWnd,POINT _ptResolution)
 {
 	m_hWnd = _hWnd;
@@ -47,8 +47,8 @@ int CCore:: init(HWND _hWnd,POINT _ptResolution)
 	CKeyMgr::GetInst()->init();
 	CSceneMgr::GetInst()->init();
 
-	g_cobj.SetPos(Vec2{ (float)(m_ptResolution.x / 2),(float)(m_ptResolution.y / 2) });
-	g_cobj.SetScale(Vec2{ 100,100 });
+	/*g_cobj.SetPos(Vec2{ (float)(m_ptResolution.x / 2),(float)(m_ptResolution.y / 2) });
+	g_cobj.SetScale(Vec2{ 100,100 });*/
 
 	
 	
